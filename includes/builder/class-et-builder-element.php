@@ -781,6 +781,39 @@ class ET_Builder_Element {
 	}
 
 	/**
+	 * Get whether third party post interference should be respected.
+	 * Current use case is for plugins like Toolset that render a
+	 * loop within a layout which renders another layout for
+	 * each post - in this case we must NOT override the
+	 * current post so the loop works as expected.
+	 *
+	 * @since ??
+	 *
+	 * @return boolean
+	 */
+	protected static function _should_respect_post_interference() {
+		$post = ET_Post_Stack::get();
+
+		return null !== $post && get_the_ID() !== $post->ID;
+	}
+
+	/**
+	 * Retrieve the main query post id.
+	 * Accounts for third party interference with the current post.
+	 *
+	 * @since ??
+	 *
+	 * @return integer|boolean
+	 */
+	protected static function _get_main_post_id() {
+		if ( self::_should_respect_post_interference() ) {
+			return get_the_ID();
+		}
+
+		return ET_Post_Stack::get_main_post_id();
+	}
+
+	/**
 	 * Retrieve Post ID from 1 of 4 sources depending on which exists:
 	 * - $_POST['current_page']['id']
 	 * - $_POST['et_post_id']
@@ -805,7 +838,7 @@ class ET_Builder_Element {
 			return absint( $_POST['post'] );
 		}
 
-		return ET_Post_Stack::get_main_post_id();
+		return self::_get_main_post_id();
 	}
 
 	/**
@@ -819,7 +852,7 @@ class ET_Builder_Element {
 	 * @return int|bool
 	 */
 	public static function get_current_post_id_reverse() {
-		$post_id = ET_Post_Stack::get_main_post_id();
+		$post_id = self::_get_main_post_id();
 
 		// try to get post id from get_post_ID()
 		if ( false !== $post_id ) {
@@ -1416,7 +1449,8 @@ class ET_Builder_Element {
 			if ( in_array( $attribute_key, array( 'url', 'button_link', 'button_url' ), true ) ) {
 				$shortcode_attributes[ $attribute_key ] = esc_url_raw( $processed_attr_value );
 			} else {
-				$shortcode_attributes[ $attribute_key ] = str_replace( array( '%22', '%92', '%91', '%93' ), array( '"', '\\', '&#91;', '&#93;' ), $processed_attr_value );
+				$shortcode_attributes[ $attribute_key ] = str_replace( array( '%22', '%92', '%91', '%93', '%5c' ), array( '"', '\\', '&#91;', '&#93;', '\\' ),
+				$processed_attr_value );
 			}
 		}
 
@@ -1935,11 +1969,13 @@ class ET_Builder_Element {
 
 		// Use the current layout or post ID for AB testing. This is not guaranteed to be the real
 		// current post ID if we are rendering a TB layout.
-		$main_post    = ET_Post_Stack::get_main_post();
-		$post_id      = apply_filters( 'et_is_ab_testing_active_post_id', self::get_layout_id() );
-		$is_main_post = $this->get_the_ID() === $post_id;
+		$post_interference = self::_should_respect_post_interference();
+		$post_id           = apply_filters( 'et_is_ab_testing_active_post_id', self::get_layout_id() );
+		$is_main_post      = $this->get_the_ID() === $post_id;
 
-		ET_Post_Stack::replace( $main_post );
+		if ( ! $post_interference ) {
+			ET_Post_Stack::replace( ET_Post_Stack::get_main_post() );
+		}
 
 		$enabled_dynamic_attributes = $this->_get_enabled_dynamic_attributes( $attrs );
 
@@ -1982,7 +2018,9 @@ class ET_Builder_Element {
 
 		// If the section/row/module is disabled, hide it
 		if ( isset( $this->props['disabled'] ) && 'on' === $this->props['disabled'] && ! $et_fb_processing_shortcode_object ) {
-			ET_Post_Stack::restore();
+			if ( ! $post_interference ) {
+				ET_Post_Stack::restore();
+			}
 			return;
 		}
 
@@ -2410,7 +2448,9 @@ class ET_Builder_Element {
 
 		$this->_bump_render_count();
 
-		ET_Post_Stack::restore();
+		if ( ! $post_interference ) {
+			ET_Post_Stack::restore();
+		}
 
 		if ( $hide_subject_module ) {
 			return '';
@@ -3499,8 +3539,12 @@ class ET_Builder_Element {
 			}
 
 			if ( ! isset( $option_settings['hide_text_color'] ) || ! $option_settings['hide_text_color'] ) {
+				$label = et_()->array_get( $option_settings, 'text_color.label', false )
+					? $option_settings['text_color']['label']
+					: sprintf( esc_html__( '%1$s Text Color', 'et_builder' ), $option_settings['label'] );
+
 				$additional_options["{$option_name}_text_color"] = array(
-					'label'           => sprintf( esc_html__( '%1$s Text Color', 'et_builder' ), $option_settings['label'] ),
+					'label'           => $label,
 					'description'     => sprintf( esc_html__( 'Pick a color to be used for the %1$s text.', 'et_builder' ), $option_settings['label'] ),
 					'type'            => 'color-alpha',
 					'option_category' => 'font_option',
@@ -11180,7 +11224,7 @@ class ET_Builder_Element {
 				if ( $this->featured_image_background ) {
 					$featured_image         = self::$_->array_get( $this->props, 'featured_image', '' );
 					$featured_placement     = self::$_->array_get( $this->props, 'featured_placement', '' );
-					$featured_image_src_obj = wp_get_attachment_image_src( get_post_thumbnail_id( ET_Post_Stack::get_main_post_id() ), 'full' );
+					$featured_image_src_obj = wp_get_attachment_image_src( get_post_thumbnail_id( self::_get_main_post_id() ), 'full' );
 					$featured_image_src     = isset( $featured_image_src_obj[0] ) ? $featured_image_src_obj[0] : '';
 
 					if ( 'on' === $featured_image && 'background' === $featured_placement && '' !== $featured_image_src ) {
@@ -11424,7 +11468,7 @@ class ET_Builder_Element {
 				if ( $this->featured_image_background ) {
 					$featured_image         = self::$_->array_get( $this->props, 'featured_image', '' );
 					$featured_placement     = self::$_->array_get( $this->props, 'featured_placement', '' );
-					$featured_image_src_obj = wp_get_attachment_image_src( get_post_thumbnail_id( ET_Post_Stack::get_main_post_id() ), 'full' );
+					$featured_image_src_obj = wp_get_attachment_image_src( get_post_thumbnail_id( self::_get_main_post_id() ), 'full' );
 					$featured_image_src     = isset( $featured_image_src_obj[0] ) ? $featured_image_src_obj[0] : '';
 
 					if ( 'on' === $featured_image && 'background' === $featured_placement && '' !== $featured_image_src ) {
@@ -14528,7 +14572,7 @@ class ET_Builder_Element {
 		foreach ( $module_icons as $key => $icons ) {
 			if ( isset( $icons['icon_path'] ) ) {
 				// Get svg content based on given svg's path
-				$icon_svg = file_exists( $icons['icon_path'] ) ? file_get_contents( $icons['icon_path'] ) : false;
+				$icon_svg = et_()->WPFS()->exists( $icons['icon_path'] ) ? et_()->WPFS()->get_contents( $icons['icon_path'] ) : false;
 
 				if ( $icon_svg ) {
 					$module_icons[ $key ]['icon_svg'] = $icon_svg;
@@ -15911,7 +15955,7 @@ class ET_Builder_Element {
 		if ( $this->featured_image_background ) {
 			$featured_image         = self::$_->array_get( $this->props, 'featured_image', '' );
 			$featured_placement     = self::$_->array_get( $this->props, 'featured_placement', '' );
-			$featured_image_src_obj = wp_get_attachment_image_src( get_post_thumbnail_id( ET_Post_Stack::get_main_post_id() ), 'full' );
+			$featured_image_src_obj = wp_get_attachment_image_src( get_post_thumbnail_id( self::_get_main_post_id() ), 'full' );
 			$featured_image_src     = isset( $featured_image_src_obj[0] ) ? $featured_image_src_obj[0] : '';
 		}
 
@@ -16172,6 +16216,12 @@ class ET_Builder_Element {
 			if ( trim( $css_value ) ) {
 				foreach ( $selectors_prepared as $selector ) {
 					$backfaceVisibilityDeclaration = in_array( $selector, $backfaceVisibilityAdded ) ? '' : $backfaceVisibility;
+
+					// Allow custom child filter target hover selector
+					if ( 'child_' == $prefix && $hover_suffix === $suffix ){
+						$selector = self::$_->array_get( $this->advanced_fields, 'filters.child_filters_target.css.hover', $selector );
+					}
+
 					ET_Builder_Element::set_style( $function_name, array_merge( array(
 						'selector'    => $selector,
 						'declaration' => sprintf(
@@ -16720,6 +16770,10 @@ class ET_Builder_Element {
 			return $builder_value->serialize();
 		}
 
+		if ( ! is_singular() ) {
+			return $builder_value->resolve( null );
+		}
+
 		return $builder_value->resolve( $post_id );
 	}
 
@@ -16949,9 +17003,9 @@ class ET_Builder_Element {
 	public static function init_cache() {
 		$cache = self::get_cache_filename();
 
-		if ( $cache && is_readable( $cache ) ) {
+		if ( $cache && et_()->WPFS()->is_readable( $cache ) ) {
 			// Load cache
-			$result = @unserialize( file_get_contents( $cache ) );
+			$result = @unserialize( et_()->WPFS()->get_contents( $cache ) );
 			if ( false !== $result ) {
 				if ( count( $result ) < 3 ) {
 					// Old cache format detected, delete everything
@@ -17052,7 +17106,7 @@ class ET_Builder_Element {
 		$post_type = trim( sanitize_file_name( $post_type ), '.' );
 		$file      = sprintf( '%s/%s-%s-%s.data', $cache, $prefix, $post_type, $uniq );
 
-		return is_writable( dirname( $file ) ) ? $file : false;
+		return wp_is_writable( dirname( $file ) ) ? $file : false;
 	}
 
 	/**
@@ -17080,7 +17134,7 @@ class ET_Builder_Element {
 		remove_filter( 'et_builder_modules_is_saving_cache', '__return_true' );
 		$cache = self::get_cache_filename();
 		if ( $cache ) {
-			@file_put_contents( $cache, serialize( array(
+			et_()->WPFS()->put_contents( $cache, serialize( array(
 				self::$_cache,
 				self::$_fields_unprocessed,
 				self::$option_template->all(),

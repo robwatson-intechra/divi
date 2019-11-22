@@ -4,7 +4,7 @@ require_once 'module/helpers/Overflow.php';
 
 if ( ! defined( 'ET_BUILDER_PRODUCT_VERSION' ) ) {
 	// Note, this will be updated automatically during grunt release task.
-	define( 'ET_BUILDER_PRODUCT_VERSION', '4.0.5' );
+	define( 'ET_BUILDER_PRODUCT_VERSION', '4.0.6' );
 }
 
 if ( ! defined( 'ET_BUILDER_VERSION' ) ) {
@@ -1026,6 +1026,65 @@ function et_fb_current_page_woocommerce_components() {
 }
 
 /**
+ * Get the category taxonomy associated with a given post type.
+ *
+ * @since 4.0.6
+ *
+ * @param string $post_type
+ *
+ * @return string|bool
+ */
+function et_builder_get_category_taxonomy( $post_type ) {
+	static $cache = array();
+
+	// Address common cases.
+	switch ( $post_type ) {
+		case 'page':
+			return false;
+		case 'post':
+			return 'category';
+		case 'project':
+			return 'project_category';
+		case 'product':
+			return 'product_cat';
+	}
+
+	if ( isset( $cache[ $post_type ] ) ) {
+		// Use cached value.
+		return $cache[ $post_type ];
+	}
+
+	// Unknown post_type, guess the taxonomy
+	$taxonomies = get_object_taxonomies( $post_type, 'names' );
+
+	foreach ( array( 'category', 'cat' ) as $pattern ) {
+		$matches = preg_grep( '/' . $pattern . '$/', $taxonomies );
+		if ( ! empty( $matches ) ) {
+			return $cache[ $post_type ] = reset( $matches );
+		}
+	}
+
+	// Tough luck.
+	return $cache[ $post_type ] = false;
+}
+
+/**
+ * Retrieve a post's category terms as a list with specified format.
+ *
+ * @since 4.0.6
+ *
+ * @param string $separator Optional. Separate items using this.
+ *
+ * @return string|false|WP_Error A list of terms on success, false if there are no terms, WP_Error on failure.
+ */
+function et_builder_get_the_term_list( $separator = '' ) {
+	$id       = get_the_ID();
+	$taxonomy = et_builder_get_category_taxonomy( get_post_type( $id ) );
+
+	return $taxonomy ? get_the_term_list( $id, $taxonomy, $before = '', $separator ) : false;
+}
+
+/**
  * Define current-page related data that are needed by frontend builder. Backend parser also uses this
  * to sanitize updated value for computed data
  *
@@ -1298,6 +1357,11 @@ function et_fb_process_to_shortcode( $object, $options = array(), $library_item_
 
 					// Make sure double quotes are encoded, before adding values to shortcode
 					$value = str_ireplace('"', '%22', $value);
+
+					// Make sure single backslash is encoded, before adding values to Shortcode.
+					if ( 'breadcrumb_separator' === $attribute ) {
+						$value = str_ireplace( '\\', '%5c', $value );
+					}
 
 					// Encode backslash for custom CSS-related and json attributes.
 					$json_attributes = array( 'checkbox_options', 'radio_options', 'select_options' );
@@ -1770,8 +1834,14 @@ function et_fb_fetch_attachments() {
 		) );
 
 		foreach ( $attachments as $index => $attachment ) {
+			$metadata = array();
+
+			foreach ( get_intermediate_image_sizes() as $size ) {
+				$metadata[ $size ] = wp_get_attachment_image_src( $attachment->ID, $size );
+			}
+
 			$attachments[ $index ] = array_merge( get_object_vars( $attachment ), array(
-				'metadata' => wp_get_attachment_metadata( $attachment->ID ),
+				'metadata' => $metadata,
 			) );
 		}
 
@@ -2688,13 +2758,19 @@ function et_pb_video_oembed_data_parse( $return, $data, $url ) {
 }
 endif;
 
-if ( ! function_exists( 'et_pb_check_oembed_provider' ) ) {
+if ( ! function_exists( 'et_pb_check_oembed_provider' ) ):
 function et_pb_check_oembed_provider( $url ) {
-	require_once( ABSPATH . WPINC . '/class-oembed.php' );
+	if ( version_compare( $GLOBALS['wp_version'], '5.3', '<' ) ) {
+		require_once( ABSPATH . WPINC . '/class-oembed.php' );
+	} else {
+		require_once( ABSPATH . WPINC . '/class-wp-oembed.php' );
+	}
+
 	$oembed = _wp_oembed_get_object();
+
 	return $oembed->get_provider( esc_url( $url ), array( 'discover' => false ) );
 }
-}
+endif;
 
 if ( ! function_exists( 'et_pb_set_video_oembed_thumbnail_resolution' ) ) :
 function et_pb_set_video_oembed_thumbnail_resolution( $image_src, $resolution = 'default' ) {

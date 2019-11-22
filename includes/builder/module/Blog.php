@@ -941,7 +941,7 @@ class ET_Builder_Module_Blog extends ET_Builder_Module_Type_PostBased {
 										: '';
 
 									$categories = 'on' === $args['show_categories']
-										? get_the_category_list(', ')
+										? et_builder_get_the_term_list(', ')
 										: '';
 
 									$categories_separator = (( 'on' === $args['show_author'] || 'on' === $args['show_date'] || 'on' === $args['show_categories'] ) && 'on' === $args['show_comments'])
@@ -1839,7 +1839,7 @@ class ET_Builder_Module_Blog extends ET_Builder_Module_Type_PostBased {
 			}
 
 			if ( isset( $post_meta_remove_keys['show_categories'] ) ) {
-				$post_meta_datas[] = get_the_category_list( ', ' );
+				$post_meta_datas[] = et_builder_get_the_term_list( ', ' );
 			}
 
 			if ( isset( $post_meta_remove_keys['show_comments'] ) ) {

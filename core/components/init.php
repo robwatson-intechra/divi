@@ -302,7 +302,7 @@ function et_core_page_resource_maybe_output_fallback_script() {
 	}
 
 	$SITE_URL = get_site_url();
-	$SCRIPT   = file_get_contents( ET_CORE_PATH . 'admin/js/page-resource-fallback.min.js' );
+	$SCRIPT   = et_()->WPFS()->get_contents( ET_CORE_PATH . 'admin/js/page-resource-fallback.min.js' );
 
 	printf( "<script>var et_site_url='%s';var et_post_id='%d';%s</script>",
 		et_core_esc_previously( $SITE_URL ),
@@ -351,6 +351,6 @@ endif;
 
 if ( ! function_exists( 'et_error' ) ):
 function et_error( $msg, $bt_index = 4 ) {
-	ET_Core_Logger::error( $msg, $bt_index );
+	ET_Core_Logger::error( "[ERROR]: {$msg}", $bt_index );
 }
 endif;

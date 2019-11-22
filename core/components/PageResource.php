@@ -341,6 +341,11 @@ class ET_Core_PageResource {
 		// Reset $_resources property; Mostly useful for unit test big request which needs to make
 		// each test*() method act like it is different page request
 		self::$_resources = null;
+
+		if ( et_()->WPFS()->exists( self::$WP_CONTENT_DIR . '/cache/et' ) ) {
+			// Remove old cache directory
+			et_()->WPFS()->rmdir( self::$WP_CONTENT_DIR . '/cache/et', true );
+		}
 	}
 
 	protected static function _assign_output_location( $location, $resource ) {
@@ -654,10 +659,10 @@ class ET_Core_PageResource {
 		switch( $property ) {
 			case 'path':
 				$value    = self::$data_utils->normalize_path( realpath( $value ) );
-				$is_valid = 0 === strpos( $value, self::$WP_CONTENT_DIR . '/cache/et' );
+				$is_valid = 0 === strpos( $value, self::$WP_CONTENT_DIR . '/et-cache' );
 				break;
 			case 'url':
-				$content_url = content_url( '/cache/et' );
+				$content_url = content_url( '/et-cache' );
 				$is_valid    = 0 === strpos( $value, set_url_scheme( $content_url, 'http' ) );
 				$is_valid    = $is_valid ? $is_valid : 0 === strpos( $value, set_url_scheme( $content_url, 'https' ) );
 				break;
@@ -706,9 +711,9 @@ class ET_Core_PageResource {
 	 */
 	public static function get_cache_directory( $path_type = 'absolute' ) {
 		if ( 'absolute' === $path_type ) {
-			$cache_dir = self::$WP_CONTENT_DIR . '/cache/et';
+			$cache_dir = self::$WP_CONTENT_DIR . '/et-cache';
 		} else {
-			$cache_dir = 'cache/et';
+			$cache_dir = 'et-cache';
 		}
 
 		if ( is_multisite() ) {
@@ -909,7 +914,7 @@ class ET_Core_PageResource {
 		foreach( (array) $files as $file ) {
 			$file = self::$data_utils->normalize_path( $file );
 
-			if ( 0 !== strpos( $file, self::$WP_CONTENT_DIR . '/cache/et' ) ) {
+			if ( 0 !== strpos( $file, self::$WP_CONTENT_DIR . '/et-cache' ) ) {
 				// File is not located inside cache directory so skip it.
 				continue;
 			}
@@ -946,7 +951,10 @@ class ET_Core_PageResource {
 			// We aren't able to write to the filesystem so let's just make sure `self::$wpfs`
 			// is an instance of the filesystem base class so that calling it won't cause errors.
 			include_once ABSPATH . 'wp-admin/includes/class-wp-filesystem-base.php';
+
 			self::$wpfs = new WP_Filesystem_Base();
+
+			et_error( 'Unable to write to filesystem. Please ensure that the web server process has write access to the WordPress directory.' );
 		}
 
 		return self::$wpfs;
@@ -972,7 +980,7 @@ class ET_Core_PageResource {
 			$this->PATH     = self::$data_utils->normalize_path( $file );
 			$this->BASE_DIR = dirname( $this->PATH );
 
-			$start     = strpos( $this->PATH, 'cache/et' );
+			$start     = strpos( $this->PATH, 'et-cache' );
 			$this->URL = content_url( substr( $this->PATH, $start ) );
 
 			if ( $files ) {

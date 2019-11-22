@@ -3152,7 +3152,7 @@ function et_divi_customizer_theme_settings( $wp_customize ) {
 	) ) );
 
 	$wp_customize->add_setting( 'et_divi[all_buttons_text_color]', array(
-		'default'		=> '#ffffff',
+		'default'		=> '',
 		'type'			=> 'option',
 		'capability'	=> 'edit_theme_options',
 		'transport'		=> 'postMessage',
@@ -3356,7 +3356,7 @@ function et_divi_customizer_theme_settings( $wp_customize ) {
 	) );
 
 	$wp_customize->add_setting( 'et_divi[all_buttons_text_color_hover]', array(
-		'default'		=> '#ffffff',
+		'default'		=> '',
 		'type'			=> 'option',
 		'capability'	=> 'edit_theme_options',
 		'transport'		=> 'postMessage',
@@ -3855,7 +3855,7 @@ function et_divi_add_customizer_css() {
 		$widget_body_line_height = floatval( et_get_option( 'widget_body_line_height', '1.7' ) );
 
 		$button_text_size = absint( et_get_option( 'all_buttons_font_size', '20' ) );
-		$button_text_color = et_get_option( 'all_buttons_text_color', '#ffffff' );
+		$button_text_color = et_get_option( 'all_buttons_text_color', '' );
 		$button_bg_color = et_get_option( 'all_buttons_bg_color', 'rgba(0,0,0,0)' );
 		$button_border_width = absint( et_get_option( 'all_buttons_border_width', '2' ) );
 		$button_border_color = et_get_option( 'all_buttons_border_color', '#ffffff' );
@@ -3864,7 +3864,7 @@ function et_divi_add_customizer_css() {
 		$button_icon = et_get_option( 'all_buttons_selected_icon', '5' );
 		$button_spacing = intval( et_get_option( 'all_buttons_spacing', '0' ) );
 		$button_icon_color = et_get_option( 'all_buttons_icon_color', '#ffffff' );
-		$button_text_color_hover = et_get_option( 'all_buttons_text_color_hover', '#ffffff' );
+		$button_text_color_hover = et_get_option( 'all_buttons_text_color_hover', '' );
 		$button_bg_color_hover = et_get_option( 'all_buttons_bg_color_hover', 'rgba(255,255,255,0.2)' );
 		$button_border_color_hover = et_get_option( 'all_buttons_border_color_hover', 'rgba(0,0,0,0)' );
 		$button_border_radius_hover = absint( et_get_option( 'all_buttons_border_radius_hover', '3' ) );
@@ -4312,7 +4312,7 @@ function et_divi_add_customizer_css() {
 		<?php if ( 'rgba' === substr( $fixed_primary_nav_bg, 0, 4 ) || ( 'rgba' === substr( $primary_nav_bg, 0, 4 ) && '#ffffff' === $fixed_primary_nav_bg ) ) { ?>
 			.et-fixed-header#main-header { box-shadow: none !important; }
 		<?php } ?>
-		<?php if ( 20 !== $button_text_size || '#ffffff' !== $button_text_color || 'rgba(0,0,0,0)' !== $button_bg_color || 2 !== $button_border_width || '#ffffff' !== $button_border_color || 3 !== $button_border_radius || '' !== $button_text_style || 0 !== $button_spacing ) { ?>
+		<?php if ( 20 !== $button_text_size || ! empty( $button_text_color ) || 'rgba(0,0,0,0)' !== $button_bg_color || 2 !== $button_border_width || '#ffffff' !== $button_border_color || 3 !== $button_border_radius || '' !== $button_text_style || 0 !== $button_spacing ) { ?>
 			<?php echo $css( 'body', '.et_pb_button' ); ?>,
 			<?php echo $css( '.woocommerce', 'a.button.alt' ); ?>,
 			<?php echo $css( '.woocommerce-page', 'a.button.alt' ); ?>,
@@ -4383,7 +4383,7 @@ function et_divi_add_customizer_css() {
 			.woocommerce-page.et_pb_button_helper_class #respond input#submit,
 			<?php echo $css( '.woocommerce.et_pb_button_helper_class #content', 'input.button' ); ?>,
 			<?php echo $css( '.woocommerce-page.et_pb_button_helper_class #content', 'input.button' ); ?> {
-				<?php if ( '#ffffff' !== $button_text_color ) { ?>
+				<?php if ( ! empty( $button_text_color ) ) { ?>
 					color: <?php echo esc_html( $button_text_color ); ?>;
 				<?php } ?>
 			}
@@ -4425,7 +4425,7 @@ function et_divi_add_customizer_css() {
 				<?php } ?>
 			}
 		<?php } ?>
-		<?php if ( '#ffffff' !== $button_text_color_hover || 'rgba(255,255,255,0.2)' !== $button_bg_color_hover || 'rgba(0,0,0,0)' !== $button_border_color_hover || 3 !== $button_border_radius_hover || 0 !== $button_spacing_hover ) { ?>
+		<?php if ( ! empty( $button_text_color_hover ) || 'rgba(255,255,255,0.2)' !== $button_bg_color_hover || 'rgba(0,0,0,0)' !== $button_border_color_hover || 3 !== $button_border_radius_hover || 0 !== $button_spacing_hover ) { ?>
 			<?php echo $css( 'body', '.et_pb_button:hover' ); ?>,
 			<?php echo $css( '.woocommerce', 'a.button.alt:hover' ); ?>,
 			<?php echo $css( '.woocommerce-page', 'a.button.alt:hover' ); ?>,
@@ -4449,7 +4449,7 @@ function et_divi_add_customizer_css() {
 			.woocommerce-page #respond input#submit:hover,
 			<?php echo $css( '.woocommerce #content', 'input.button:hover' ); ?>,
 			<?php echo $css( '.woocommerce-page #content', 'input.button:hover' ); ?> {
-				<?php if ( '#ffffff' !== $button_text_color_hover ) { ?>
+				<?php if ( ! empty( $button_text_color_hover ) ) { ?>
 					 color: <?php echo esc_html( $button_text_color_hover ); ?> !important;
 				<?php } ?>
 				<?php if ( 'rgba(255,255,255,0.2)' !== $button_bg_color_hover ) { ?>

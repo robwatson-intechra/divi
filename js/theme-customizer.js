@@ -2674,6 +2674,10 @@
 								</style>",
 				style_id = 'style#buttons_text_color';
 
+			if ( ! to ) {
+				$style_content = '';
+			}
+
 			et_customizer_update_styles( style_id, $button_style );
 		} );
 	} );
@@ -2829,6 +2833,10 @@
 		value.bind( function( to ) {
 			var	$button_style = '<style id="buttons_text_color_hover">' + buttons_hover_selector + ' { color: ' + to + ' !important; } </style>',
 				style_id = 'style#buttons_text_color_hover';
+			
+			if ( ! to ) {
+				$button_style = '';
+			}
 
 			et_customizer_update_styles( style_id, $button_style );
 		} );

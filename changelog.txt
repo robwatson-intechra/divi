@@ -1,3 +1,172 @@
+version 4.0.6 ( updated 11-07-2019 )
+- Fixing compatibility issues for upcoming WordPress 5.3.
+- Fixed Woocommerce Cart Notice duplication on product pages built with Theme Builder.
+- Fixed spacing values being out of sync when you switch between responsive tabs.
+- Fixed the issue when the Text Link options did not have priority over to the Text Body options of the Woo Meta module in some cases.
+- Fixed Blog Module not showing Categories when used with Custom Post Types.
+- Fixed incorrect animation on Accordion module when custom padding defined.
+- Added Copy/Paste styles amongst "In Stock/Out of Stock/On Backorder" option groups.
+- Added new custom CSS fields to the Woo Additional Info module.
+- Fixed border styles settings issue where user can't use default value on tablet and phone modes.
+- Fixed vh-unit issue on page settings' custom css output on visual builder.
+- Fixed Builder crashed with error cannot read property 'split' of undefined.
+- Fixed Shortcodes not working in the Woo Tabs.
+- Ensure the correct file permissions are applied to the builder's cache files.
+- Removed unwanted advanced options at audio and person module's general tab > image options group.
+- Fixed compatibility with Toolset Views.
+- Fixed Breadcrumb separator option to allow \ to be displayed in FE correctly.
+- Disabled hover over Social Media Follow icons on VB preview.
+- Update localization strings for Theme Builder.
+- Fixed Blurb image hover styles not taking effect when hovering outside the image element.
+- Fixed wrong gutter width on hover in certain cases.
+- Fixed only the title being clickable in the fullwidth portfolio.
+- Added the "Enable Raw HTML" option for ACF custom fields in Theme Builder.
+- Fixed Star Rating Option group option names.
+- Added Star Rating option group to the Shop module.
+- Added Quick actions to Woo Add to Cart module's label.
+- Fixed compatibility issue with WP Offload media Lite plugin for thubnail URL in gallery module setting modal.
+- Fixed Add to Cart button background not working when Color scheme is set.
+- Added et_pb_menu_module_cart_output filter to the Cart Icon HTML in Menu Module for 3rd party plugins.
+- Fixed white button color in customizer not being applied.
+	* core/components/PageResource.php
+	* core/components/api/Service.php
+	* core/components/cache/File.php
+	* core/components/data/Utils.php
+	* core/components/init.php
+	* core/functions.php
+	* core/languages/ar.po
+	* core/languages/bg_BG.po
+	* core/languages/cs_CZ.po
+	* core/languages/da_DK.po
+	* core/languages/de_DE.po
+	* core/languages/el.po
+	* core/languages/en_US.po
+	* core/languages/es_ES.po
+	* core/languages/fi.po
+	* core/languages/fr_FR.po
+	* core/languages/he_IL.po
+	* core/languages/hu_HU.po
+	* core/languages/id_ID.po
+	* core/languages/it_IT.po
+	* core/languages/ja.po
+	* core/languages/ko_KR.po
+	* core/languages/ms_MY.po
+	* core/languages/nb_NO.po
+	* core/languages/nl_NL.po
+	* core/languages/pl_PL.po
+	* core/languages/pt_BR.po
+	* core/languages/ro_RO.po
+	* core/languages/ru_RU.po
+	* core/languages/sk_SK.po
+	* core/languages/sr_RS.po
+	* core/languages/sv_SE.po
+	* core/languages/th.po
+	* core/languages/tl.po
+	* core/languages/tr_TR.po
+	* core/languages/uk.po
+	* core/languages/vi.po
+	* core/languages/zh_CN.po
+	* functions.php
+	* includes/builder/class-et-builder-element.php
+	* includes/builder/conditions.php
+	* includes/builder/core.php
+	* includes/builder/deprecations.php
+	* includes/builder/feature/Library.php
+	* includes/builder/feature/woocommerce-modules.php
+	* includes/builder/framework.php
+	* includes/builder/frontend-builder/assets.php
+	* includes/builder/frontend-builder/bundle.js
+	* includes/builder/frontend-builder/theme-builder/api.php
+	* includes/builder/frontend-builder/view.php
+	* includes/builder/functions.php
+	* includes/builder/languages/ar.po
+	* includes/builder/languages/bg_BG.po
+	* includes/builder/languages/cs_CZ.po
+	* includes/builder/languages/da_DK.po
+	* includes/builder/languages/de_DE.po
+	* includes/builder/languages/el.po
+	* includes/builder/languages/en_US.po
+	* includes/builder/languages/es_ES.po
+	* includes/builder/languages/fi.po
+	* includes/builder/languages/fr_FR.po
+	* includes/builder/languages/he_IL.po
+	* includes/builder/languages/hu_HU.po
+	* includes/builder/languages/id_ID.po
+	* includes/builder/languages/it_IT.po
+	* includes/builder/languages/ja.po
+	* includes/builder/languages/ko_KR.po
+	* includes/builder/languages/ms_MY.po
+	* includes/builder/languages/nb_NO.po
+	* includes/builder/languages/nl_NL.po
+	* includes/builder/languages/pl_PL.po
+	* includes/builder/languages/pt_BR.po
+	* includes/builder/languages/ro_RO.po
+	* includes/builder/languages/ru_RU.po
+	* includes/builder/languages/sk_SK.po
+	* includes/builder/languages/sr_RS.po
+	* includes/builder/languages/sv_SE.po
+	* includes/builder/languages/th.po
+	* includes/builder/languages/tl.po
+	* includes/builder/languages/tr_TR.po
+	* includes/builder/languages/uk.po
+	* includes/builder/languages/vi.po
+	* includes/builder/languages/zh_CN.po
+	* includes/builder/main-structure-elements.php
+	* includes/builder/module/Accordion.php
+	* includes/builder/module/Blog.php
+	* includes/builder/module/Blurb.php
+	* includes/builder/module/ContactForm.php
+	* includes/builder/module/FullwidthMenu.php
+	* includes/builder/module/Menu.php
+	* includes/builder/module/Shop.php
+	* includes/builder/module/Signup.php
+	* includes/builder/module/type/WithSpamProtection.php
+	* includes/builder/module/woocommerce/AddToCart.php
+	* includes/builder/module/woocommerce/AdditionalInfo.php
+	* includes/builder/module/woocommerce/CartNotice.php
+	* includes/builder/module/woocommerce/Meta.php
+	* includes/builder/module/woocommerce/Rating.php
+	* includes/builder/module/woocommerce/RelatedProducts.php
+	* includes/builder/module/woocommerce/Tabs.php
+	* includes/builder/module/woocommerce/Upsells.php
+	* includes/builder/plugin-compat/advanced-custom-fields.php
+	* includes/builder/scripts/frontend-builder-scripts.js
+	* includes/builder/styles/style.css
+	* js/theme-customizer-controls.js
+	* js/theme-customizer.js
+	* lang/ar.po
+	* lang/bg_BG.po
+	* lang/cs_CZ.po
+	* lang/da_DK.po
+	* lang/de_DE.po
+	* lang/el.po
+	* lang/en_US.po
+	* lang/es_ES.po
+	* lang/fi.po
+	* lang/fr_FR.po
+	* lang/he_IL.po
+	* lang/hu_HU.po
+	* lang/id_ID.po
+	* lang/it_IT.po
+	* lang/ja.po
+	* lang/ko_KR.po
+	* lang/ms_MY.po
+	* lang/nb_NO.po
+	* lang/nl_NL.po
+	* lang/pl_PL.po
+	* lang/pt_BR.po
+	* lang/ro_RO.po
+	* lang/ru_RU.po
+	* lang/sk_SK.po
+	* lang/sr_RS.po
+	* lang/sv_SE.po
+	* lang/th.po
+	* lang/tl.po
+	* lang/tr_TR.po
+	* lang/uk.po
+	* lang/vi.po
+	* lang/zh_CN.po
+
 version 4.0.5 ( updated 11-01-2019 )
 - Fixed WooCommerce Modules' broken automatically-added placeholder content in Theme Builder.
 - Fixed quote blocks missing when using the Quote post format and a Post Content module in Theme Builder.

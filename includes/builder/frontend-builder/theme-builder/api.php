@@ -388,7 +388,7 @@ function et_theme_builder_api_import_theme_builder() {
 		) );
 	}
 
-	$export = json_decode( file_get_contents( $upload['file'] ), true );
+	$export = json_decode( et_()->WPFS()->get_contents( $upload['file'] ), true );
 
 	if ( null === $export ) {
 		wp_send_json_error( array(

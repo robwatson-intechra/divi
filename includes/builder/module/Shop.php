@@ -24,6 +24,7 @@ class ET_Builder_Module_Shop extends ET_Builder_Module_Type_PostBased {
 				'toggles' => array(
 					'overlay' => esc_html__( 'Overlay', 'et_builder' ),
 					'image'   => esc_html__( 'Image', 'et_builder' ),
+					'star'    => esc_html__( 'Star Rating', 'et_builder' ),
 				),
 			),
 		);
@@ -70,7 +71,7 @@ class ET_Builder_Module_Shop extends ET_Builder_Module_Type_PostBased {
 				'sale_price' => array(
 					'label'           => esc_html__( 'Sale Price', 'et_builder' ),
 					'css'             => array(
-						'main'    => "{$this->main_css_element} .woocommerce ul.products li.product .price ins .amount",
+						'main' => "{$this->main_css_element} .woocommerce ul.products li.product .price ins .amount",
 					),
 					'hide_text_align' => true,
 					'font'            => array(
@@ -83,6 +84,33 @@ class ET_Builder_Module_Shop extends ET_Builder_Module_Type_PostBased {
 							'step' => '1',
 						),
 					),
+				),
+				'rating'     => array(
+					'label'            => esc_html__( 'Star Rating', 'et_builder' ),
+					'css'              => array(
+						'main'                 => '%%order_class%% .star-rating',
+						'hover'                => '%%order_class%% li.product:hover .star-rating',
+						'color'                => '%%order_class%% .star-rating > span:before',
+						'color_hover'          => '%%order_class%% li.product:hover .star-rating > span:before',
+						'letter_spacing_hover' => '%%order_class%% li.product:hover .star-rating',
+						'important'            => array( 'size' ),
+					),
+					'font_size'        => array(
+						'default' => '14px',
+					),
+					'hide_font'        => true,
+					'hide_line_height' => true,
+					'hide_text_shadow' => true,
+					'text_align'       => array(
+						'label' => esc_html__( 'Star Rating Alignment', 'et_builder' ),
+					),
+					'font_size'        => array(
+						'label' => esc_html__( 'Star Rating Size', 'et_builder' ),
+					),
+					'text_color'       => array(
+						'label' => esc_html__( 'Star Rating Color', 'et_builder' ),
+					),
+					'toggle_slug'      => 'star',
 				),
 			),
 			'borders'               => array(
@@ -407,10 +435,26 @@ class ET_Builder_Module_Shop extends ET_Builder_Module_Type_PostBased {
 		return $fields;
 	}
 
+	/**
+	 * @inheritdoc
+	 *
+	 * @since ?? Handle star rating letter spacing.
+	 */
 	public function get_transition_fields_css_props() {
 		$fields = parent::get_transition_fields_css_props();
 
-		$fields['sale_badge_color'] = array( 'background-color' => '%%order_class%% span.onsale' );
+		$fields['sale_badge_color']      = array( 'background-color' => '%%order_class%% span.onsale' );
+		$fields['rating_letter_spacing'] = array(
+			'width'          => '%%order_class%% .star-rating',
+			'letter-spacing' => '%%order_class%% .star-rating',
+		);
+
+		$is_hover_enabled = et_builder_is_hover_enabled( 'rating_letter_spacing', $this->props )
+			|| et_builder_is_hover_enabled( 'rating_font_size', $this->props );
+
+		if ( $is_hover_enabled && isset( $fields['rating_text_color'] ) ) {
+			unset( $fields['rating_text_color'] );
+		}
 
 		return $fields;
 	}
@@ -625,6 +669,13 @@ class ET_Builder_Module_Shop extends ET_Builder_Module_Type_PostBased {
 			'icon_tablet' => $hover_icon_tablet,
 			'icon_phone'  => $hover_icon_phone,
 		) );
+
+		ET_Builder_Module_Helper_Woocommerce_Modules::add_star_rating_style(
+			$render_slug,
+			$this->props,
+			'%%order_class%% ul.products li.product .star-rating',
+			'%%order_class%% ul.products li.product:hover .star-rating'
+		);
 
 		// Module classnames
 		$this->add_classname( array(

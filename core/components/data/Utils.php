@@ -412,6 +412,40 @@ class ET_Core_Data_Utils {
 	}
 
 	/**
+	 * Creates a path string using the provided arguments.
+	 *
+	 * Examples:
+	 *   - ```
+	 *      et_()->path( '/this/is', 'a', 'path' );
+	 *      // Returns '/this/is/a/path'
+	 *     ```
+	 *   - ```
+	 *      et_()->path( ['/this/is', 'a', 'path', 'to', 'file.php'] );
+	 *      // Returns '/this/is/a/path/to/file.php'
+	 *     ```
+	 *
+	 * @since ??
+	 *
+	 * @param string|string[] ...$parts
+	 *
+	 * @return string
+	 */
+	public function path() {
+		$parts = func_get_args();
+		$path  = '';
+
+		if ( 1 === count( $parts ) && is_array( reset( $parts ) ) ) {
+			$parts = array_pop( $parts );
+		}
+
+		foreach ( $parts as $part ) {
+			$path .= "{$part}/";
+		}
+
+		return substr( $path, 0, -1 );
+	}
+
+	/**
 	 * Process an XML-RPC response string.
 	 *
 	 * @param $response
@@ -453,7 +487,7 @@ class ET_Core_Data_Utils {
 	 *
 	 * @param string $path Absolute path to parent directory.
 	 */
-	function remove_empty_directories( $path ) {
+	public function remove_empty_directories( $path ) {
 		$path = realpath( $path );
 
 		if ( empty( $path ) ) {
@@ -485,7 +519,7 @@ class ET_Core_Data_Utils {
 	 *
 	 * @return bool
 	 */
-	function includes( $haystack, $needle ) {
+	public function includes( $haystack, $needle ) {
 		if ( is_string( $haystack ) ) {
 			return false !== strpos( $haystack, $needle );
 		}
@@ -699,7 +733,7 @@ class ET_Core_Data_Utils {
 	 *
 	 * @return string
 	 */
-	function camel_case( $string, $no_strip = array() ) {
+	public function camel_case( $string, $no_strip = array() ) {
 		$words = preg_split( '/[^a-zA-Z0-9' . implode( '', $no_strip ) . ']+/i', strtolower( $string ) );
 
 		if ( count( $words ) === 1 ) {
@@ -711,6 +745,17 @@ class ET_Core_Data_Utils {
 		$camel_cased[0] = strtolower( $camel_cased[0] );
 
 		return $camel_cased;
+	}
+
+	/**
+	 * Returns the WP Filesystem instance.
+	 *
+	 * @since ??
+	 *
+	 * @return WP_Filesystem_Base {@see ET_Core_PageResource::wpfs()}
+	 */
+	public function WPFS() {
+		return ET_Core_PageResource::wpfs();
 	}
 }
 

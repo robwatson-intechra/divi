@@ -194,7 +194,7 @@ function et_builder_inject_preboot_script() {
 
 	$preboot_path   = ET_BUILDER_DIR . 'frontend-builder/build/preboot.js';
 	if ( file_exists( $preboot_path ) ) {
-		$preboot_script = file_get_contents( $preboot_path );
+		$preboot_script = et_()->WPFS()->get_contents( $preboot_path );
 	} else {
 		// if the file doesn't exists, it means we're using `yarn hot`
 		$site_url = wp_parse_url( get_site_url() );

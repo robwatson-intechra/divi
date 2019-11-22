@@ -64,7 +64,7 @@ function et_fb_get_dynamic_asset( $prefix, $post_type = false, $update = false )
 		$content = apply_filters( "et_fb_get_asset_$prefix", false, $post_type );
 		if ( $exists && $update ) {
 			// Compare with old one (when a previous version exists)
-			$update = file_get_contents( $file ) !== $content;
+			$update = et_()->WPFS()->get_contents( $file ) !== $content;
 		}
 		if ( ( $update || ! $exists ) ) {
 
@@ -84,7 +84,7 @@ function et_fb_get_dynamic_asset( $prefix, $post_type = false, $update = false )
 			$uniq = str_replace( '.', '', (string) microtime( true ) );
 			$file = sprintf( '%s/%s-%s-%s.js', $cache, $prefix, $post_type, $uniq );
 
-			if ( is_writable( dirname( $file ) ) && file_put_contents( $file, $content ) ) {
+			if ( wp_is_writable( dirname( $file ) ) && et_()->WPFS()->put_contents( $file, $content ) ) {
 				$updated = true;
 				$exists  = true;
 			}

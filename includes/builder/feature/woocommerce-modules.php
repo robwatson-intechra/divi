@@ -482,8 +482,11 @@ function et_builder_wc_render_module_template( $function_name, $args = array(), 
 
 	switch( $function_name ) {
 		case 'woocommerce_breadcrumb':
+			$breadcrumb_separator = et_()->array_get( $args, 'breadcrumb_separator', '' );
+			$breadcrumb_separator = str_replace( '&#8221;', '', $breadcrumb_separator );
+
 			woocommerce_breadcrumb( array(
-				'delimiter'   => ' ' . et_()->array_get( $args, 'breadcrumb_separator', '' ) . ' ',
+				'delimiter'   => ' ' . $breadcrumb_separator . ' ',
 				'home'        => et_()->array_get( $args, 'breadcrumb_home_text', '' ),
 			) );
 			break;

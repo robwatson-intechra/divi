@@ -1009,7 +1009,7 @@ class ET_Builder_Library {
 
 		$tmp_file = tempnam( $tmp_dir, 'et' );
 
-		@file_put_contents( $tmp_file, $response );
+		et_()->WPFS()->put_contents( $tmp_file, $response );
 
 		// Remove any previous buffered content since we're setting `Content-Length` header
 		// based on $response value only.

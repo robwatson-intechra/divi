@@ -165,7 +165,7 @@ class ET_Builder_Module_Woocommerce_Cart_Notice extends ET_Builder_Module {
 		);
 
 		// Clear notices array which was modified during render.
-		add_action( 'et_builder_wc_product_after_render_layout', array( 'ET_Builder_Module_Woocommerce_Cart_Notice', 'clear_notices' ) );
+		add_action( 'wp_footer', array( 'ET_Builder_Module_Woocommerce_Cart_Notice', 'clear_notices' ) );
 	}
 
 	/**

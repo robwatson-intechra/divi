@@ -129,6 +129,8 @@ class ET_Builder_Module_Woocommerce_Add_To_Cart extends ET_Builder_Module {
 						'main'         => '%%order_class%% .button',
 						'limited_main' => '%%order_class%% .button',
 						'alignment'    => '%%order_class%% .et_pb_module_inner > form',
+						// Setting to TRUE since it only checks for the value's existence.
+						'important'    => true,
 					),
 
 					/*

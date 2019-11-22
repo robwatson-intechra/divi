@@ -162,7 +162,7 @@ class ET_Builder_Plugin_Compat_Advanced_Custom_Fields extends ET_Builder_Plugin_
 			$fields = acf_get_fields( $group['ID'] );
 
 			foreach ( $fields as $field ) {
-				$custom_fields["custom_meta_{$field['name']}"] = array(
+				$settings = array(
 					'label'  => esc_html( $field['label'] ),
 					'type'   => 'any',
 					'fields' => array(
@@ -183,6 +183,21 @@ class ET_Builder_Plugin_Compat_Advanced_Custom_Fields extends ET_Builder_Plugin_
 					'custom'   => true,
 					'group'    => "ACF: {$group['title']}",
 				);
+
+				if ( current_user_can( 'unfiltered_html' ) ) {
+					$settings['fields']['enable_html'] = array(
+						'label'   => esc_html__( 'Enable raw HTML', 'et_builder' ),
+						'type'    => 'yes_no_button',
+						'options' => array(
+							'on'  => esc_html__( 'Yes', 'et_builder' ),
+							'off' => esc_html__( 'No', 'et_builder' ),
+						),
+						'default' => 'off',
+						'show_on' => 'text',
+					);
+				}
+
+				$custom_fields["custom_meta_{$field['name']}"] = $settings;
 			}
 		}
 
